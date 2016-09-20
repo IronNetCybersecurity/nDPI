@@ -36,7 +36,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
   u_int8_t is_query, ret_code;
   u_int16_t s_port = 0;
   u_int16_t d_port = 0;
-  
+
   NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "search DNS.\n");
 
   if(flow->packet.udp != NULL)
@@ -104,7 +104,7 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
 
     if(invalid) {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
-      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);    
+      NDPI_ADD_PROTOCOL_TO_BITMASK(flow->excluded_protocol_bitmask, NDPI_PROTOCOL_DNS);
       return;
     }
 
@@ -112,18 +112,15 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     ret_code = (is_query == 0) ? 0 : (dns_header.flags & 0x0F);
     int j = 0;
     int off = sizeof(struct ndpi_dns_packet_header) + 1;
-    while((flow->packet.payload[off] != '\0'))
+    while(off < flow->packet.payload_packet_len && (flow->packet.payload[off] != '\0'))
     {
-      if(off < flow->packet.payload_packet_len)
-      {
-	flow->host_server_name[j] = flow->packet.payload[off];
-	if(j < strlen((char*)flow->host_server_name)) {
-	  if(flow->host_server_name[j] < ' ')
-	    flow->host_server_name[j] = '.';
-	  j++;
-	}
-	off++;
+      flow->host_server_name[j] = flow->packet.payload[off];
+      if(j < strlen((char*)flow->host_server_name)) {
+        if(flow->host_server_name[j] < ' ')
+          flow->host_server_name[j] = '.';
+        j++;
       }
+      off++;
     }
     flow->host_server_name[j] = '\0';
 
@@ -131,18 +128,18 @@ void ndpi_search_dns(struct ndpi_detection_module_struct *ndpi_struct, struct nd
     flow->protos.dns.ret_code = ret_code;
 
     if(j > 0)
-      ndpi_match_host_subprotocol(ndpi_struct, flow, 
+      ndpi_match_host_subprotocol(ndpi_struct, flow,
 				  (char *)flow->host_server_name,
 				  strlen((const char*)flow->host_server_name),
 				  NDPI_PROTOCOL_DNS);
-    
+
     if(flow->packet.detected_protocol_stack[0] == NDPI_PROTOCOL_UNKNOWN)
     {
       /**
 	 Do not set the protocol with DNS if ndpi_match_host_subprotocol() has
 	 matched a subprotocol
       **/
-      NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");      
+      NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "found DNS.\n");
       ndpi_set_detected_protocol(ndpi_struct, flow, (d_port == 5355) ? NDPI_PROTOCOL_LLMNR : NDPI_PROTOCOL_DNS, NDPI_PROTOCOL_UNKNOWN);
     } else {
       NDPI_LOG(NDPI_PROTOCOL_DNS, ndpi_struct, NDPI_LOG_DEBUG, "exclude DNS.\n");
