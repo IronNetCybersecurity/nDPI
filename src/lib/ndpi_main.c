@@ -3947,6 +3947,10 @@ u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi
   return(flow->detected_protocol_stack[1]);
 }
 
+u_int16_t ndpi_get_flow_packet_counter(struct ndpi_flow_struct *flow) {
+  return(flow->packet_counter);
+}
+
 void ndpi_int_change_flow_protocol(struct ndpi_detection_module_struct *ndpi_struct,
 				   struct ndpi_flow_struct *flow,
 				   u_int16_t upper_detected_protocol,

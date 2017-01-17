@@ -237,6 +237,15 @@ extern "C" {
   u_int16_t ndpi_get_flow_masterprotocol(struct ndpi_detection_module_struct *ndpi_struct,
 					 struct ndpi_flow_struct *flow);
 
+  /**
+   * Get the packet counter of the given flow
+   *
+   *
+   * @par    flow         = the given flow
+   * @return packet counter of the given flow
+   *
+   */
+  u_int16_t ndpi_get_flow_packet_counter(struct ndpi_flow_struct *flow);
   
   /**
    * Query the pointer to the layer 4 packet
