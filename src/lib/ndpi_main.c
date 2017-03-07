@@ -4519,6 +4519,9 @@ void ndpi_free_flow(struct ndpi_flow_struct *flow) {
   if(flow) {
     if(flow->http.url)          ndpi_free(flow->http.url);
     if(flow->http.content_type) ndpi_free(flow->http.content_type);
+    memset(flow,0,sizeof(struct ndpi_flow_struct));
+    flow->http.url = (void *) 0xdeadbeefbadf00d;
+    flow->http.content_type = (void *) 0xdeadbeefbadf00d;
     ndpi_free(flow);
   }
 }
